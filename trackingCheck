@@ -1,0 +1,51 @@
+function trackingFedEx() {
+  
+  var sheet = SpreadsheetApp.getActiveSheet();
+
+  var startRow = 2;
+  var lastRow = sheet.getLastRow();
+  var lastColumn = sheet.getLastColumn();
+  var lastCell = sheet.getRange(lastRow, lastColumn);
+
+  // Fetch the range of cells A2,1 to lastRow,1
+  var dataRange = sheet.getRange(startRow, 1, (lastRow - 1), 15);
+  var data = dataRange.getValues();
+
+  for (var i = 0; i < data.length; ++i) {
+    var row = data[i];
+    var name = row[0]; // First column
+    var emailAddress = row[2];
+    var mailingAddress = row[3];
+    var equipmentStatus = row[4];
+    var trackingInfoTo = row[5];
+    var trackingInfoReturn = row[6];
+    var trackingInfoReturnRange = sheet.getRange(startRow + i, 7);
+    var firstEmailDate = row[10];
+    var secondEmailDate = row[11];
+    var thirdEmailDate = row[12];
+    var fourthEmailDate = row[13];
+    var statusCell = row[14];
+
+    if (trackingInfoReturnRange.isBlank()){
+      Logger.log('No Tracking Number');
+      sheet.getRange(startRow + i, 5).setValue('No Tracking');
+      continue;
+    }
+    else if (equipmentStatus != 'Delivered') {
+
+      var deliveryResults = trackingNumber(trackingInfoReturn);
+      var deliveryDescription = deliveryResults[0];
+      var deliveryDate = deliveryResults[1];
+
+      Logger.log(name + ' ' + trackingInfoReturn);
+  
+      sheet.getRange(startRow + i, 5).setValue(deliveryDescription);
+      continue;
+    };
+
+  }
+
+}
+
+
+
