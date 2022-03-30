@@ -1,0 +1,35 @@
+function fedexOauthProd() {
+
+
+  var client_id = "";
+  var client_secret = "";
+
+
+
+
+  var input = "grant_type=client_credentials&client_id=" + client_id + "&client_secret=" + client_secret
+
+  var requestOptions = {
+    method: 'POST',
+    host: 'https://apis.fedex.com',
+    payload: input,
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded'
+    },
+    //redirect: 'follow',
+    muteHttpExceptions: true
+  };
+
+  var response = UrlFetchApp.fetch('https://apis.fedex.com/oauth/token', requestOptions)
+  var json = JSON.parse(response.getContentText());
+  var oauthToken = json.access_token;
+  var tokenType = json.token_type;
+  var authToken = [oauthToken, tokenType];
+
+  //Logger.log(response.getContentText());
+  //Logger.log(oauthToken);
+
+  return authToken;
+
+
+}
