@@ -1,0 +1,160 @@
+function createShipmentProd(name, mailingAddress, ticketNumber) {
+
+//Logger = BetterLog.useSpreadsheet('1qYzJ3xVJoklzQW_bsa0DSv-f7D_ijDpdmP18cONfFN0'); 
+
+  var results = fedexOauthProd();
+  var oauthToken = results[0];
+  var tokenType = results[1];
+  //Logger.log(oauthToken);
+
+  var senderStreetLine1 = 'senderStreetLine1';
+  var senderStreetLine2 = 'senderStreetLine2';
+  var senderStreetLine = [senderStreetLine1, senderStreetLine2];
+  var senderCity = 'San Francisco';
+  var senderState = 'CA';
+  var senderPost = 'senderPost';
+  var countryCode = 'US';
+  var senderPhone = '8004251267'
+
+
+  var validatedRecipient = validateAddressProd(mailingAddress);
+  var recipientStreet = (validatedRecipient[0].toString());
+  var recipientCity = validatedRecipient[1];
+  var recipientState = validatedRecipient[2];
+  var recipientPost = validatedRecipient[3];
+  var recipientCountry = validatedRecipient[4];
+  //Logger.log(recipientStreet);
+ 
+
+/**
+//  var validatedRecipient = validateAddress();
+  var recipientStreet =  '333 90th St.';
+  //Logger.log(recipientStreet);
+  var recipientCity = 'Daly City';
+  var recipientState = 'CA';
+  var recipientPost = '94015';
+  var recipientCountry = 'US';
+  //Logger.log(recipientStreet);
+*/
+
+  var input = {
+    //'mergeLabelDocOption':'LABELS_ONLY',
+    'requestedShipment': {
+      'totalDeclaredValue': {
+        'amount': 1500,
+        'currency': 'USD'
+      },
+      'shipper': {
+        'address': {
+          'streetLines': 
+            senderStreetLine
+          ,
+          'city': senderCity,
+          'stateOrProvinceCode': senderState,
+          'postalCode':senderPost,
+          'countryCode':countryCode 
+        },
+        'contact': {
+          'personName':'personName',
+          'emailAddress':'emailAddress',
+          'phoneNumber': senderPhone 
+        }
+      },
+      'recipients': [
+        {
+          'address': {
+            'streetLines': [
+              recipientStreet
+            ],
+            'city': recipientCity,
+            'stateOrProvinceCode': recipientState,
+            'postalCode': recipientPost,
+            'countryCode': recipientCountry
+          },
+          'contact':{
+            'personName': name,
+            'phoneNumber':'0000000000'
+          },
+        }
+      ],
+      'pickupType': 'DROPOFF_AT_FEDEX_LOCATION',
+      'serviceType': 'FEDEX_2_DAY',
+      'packagingType': 'FEDEX_BOX',
+      'shippingChargesPayment': {
+        'paymentType': 'SENDER'
+      },
+      'labelSpecification': {
+        'labelStockType': 'PAPER_85X11_TOP_HALF_LABEL',
+        'imageType': 'PDF'
+      },
+      'requestedPackageLineItems': [
+        {
+          'customerReferences': [
+            {'customerReferenceType': 'CUSTOMER_REFERENCE',
+            'value': ticketNumber
+            }
+          ],
+          'declaredValue': {
+            'amount': 1000,
+            'currency': 'USD'
+          },
+          'weight': {
+            'units': 'LB',
+            'value': '10'
+          }
+        }
+      ],
+    },
+    'labelResponseOptions': 'URL_ONLY',
+    'accountNumber': {
+      'value': '642425692'
+    }
+  };
+
+  var jsonInput = JSON.stringify(input);
+  //Logger.log(jsonInput);
+
+  var requestOptions = {
+    method: 'POST',
+    host: 'https://apis.fedex.com/ship/v1/shipments',
+    //host: 'https://apis-sandbox.fedex.com/ship/v1/shipments',
+    headers: {
+      'Authorization': tokenType + ' ' + oauthToken,
+      'Content-Type': 'application/json',
+      'X-locale': 'en_US',
+    },
+    payload: jsonInput,
+    //redirect: 'follow',
+    muteHttpExceptions: true
+  };
+  //Logger.log(oauthToken);
+  //var response = UrlFetchApp.fetch('https://apis-sandbox.fedex.com/ship/v1/shipments', requestOptions);
+  var response = UrlFetchApp.fetch('https://apis.fedex.com/ship/v1/shipments', requestOptions);
+  var jsonOutput = JSON.parse(response.getContentText());
+  Logger.log(response.getContentText());
+  //console.log(jsonOutput);
+  //console.log(jsonOutput);
+
+  var recipientTracking = jsonOutput['output']['transactionShipments'][0]['masterTrackingNumber'];
+  var url = jsonOutput['output']['transactionShipments'][0]['pieceResponses'][0]['packageDocuments'][0]['url'];
+  var test2 = jsonOutput['output']['transactionShipments'][0]['pieceResponses'][0]['packageDocuments'];
+
+  var shipmentLabel = [recipientTracking, url];
+
+
+
+  //Logger.log('Tracking Number: ' + recipientTracking);
+  //Logger.log(url);
+  //Logger.log(test2);
+
+
+    return shipmentLabel;
+
+
+
+};
+
+
+
+
+
