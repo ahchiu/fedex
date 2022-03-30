@@ -1,0 +1,74 @@
+//https://developer.fedex.com/api/en-us/catalog/ship/v1/docs.html
+
+function validateAddressProd(mailingAddress) {
+
+  var authToken = fedexOauthProd();
+  var oauthToken = authToken[0];
+  var tokenType = authToken[1];
+  Logger.log('oauthToken granted.');
+
+  var input = {
+    'addressesToValidate': [
+      {
+        'address': {
+          'streetLines': [
+            mailingAddress
+          ],
+          "countryCode": "US"
+        }
+
+      }
+    ],
+  };
+
+  var jsonInput = JSON.stringify(input);
+
+  var requestOptions = {
+    method: 'POST',
+    host: 'https://apis.fedex.com',
+    //host: 'https://apis-sandbox.fedex.com',
+    headers: {
+      "Authorization": tokenType + " " + oauthToken,
+      'Content-Type': 'application/json',
+      "X-locale": "en_US",
+    },
+    payload: jsonInput,
+    //redirect: 'follow',
+    muteHttpExceptions: true
+  };
+  //Logger.log(oauthToken);
+  //var response = UrlFetchApp.fetch('https://apis-sandbox.fedex.com/address/v1/addresses/resolve', requestOptions);
+  var response = UrlFetchApp.fetch('https://apis.fedex.com/address/v1/addresses/resolve', requestOptions);
+  var json = JSON.parse(response.getContentText());
+
+  Logger.log(response.getContentText());
+
+ 
+  var recipient = json['output']["resolvedAddresses"];
+  var recipientStreet = json.output.resolvedAddresses[0].streetLinesToken;
+  var recipientCity = json.output.resolvedAddresses[0].city;
+  var recipientState = json.output.resolvedAddresses[0].stateOrProvinceCode;
+  var recipientPost = json.output.resolvedAddresses[0].postalCode;
+  var recipientCountry = json.output.resolvedAddresses[0].countryCode;
+
+  var validatedRecipient = [recipientStreet, recipientCity, recipientState, recipientPost, recipientCountry];
+
+
+  Logger.log(validatedRecipient);
+  /** 
+  Logger.log(oauthToken);
+  
+  Logger.log(recipientStreet);
+  Logger.log(recipientCity);
+  Logger.log(recipientState);
+  Logger.log(recipientPost);
+  Logger.log(recipientCountry);
+  */
+
+  return validatedRecipient; 
+
+
+
+}
+
+
