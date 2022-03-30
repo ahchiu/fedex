@@ -1,0 +1,50 @@
+function trackingNumber(trackingInfoReturn) {
+
+  var authToken = fedexOauthProd();
+  var oauthToken = authToken[0];
+  var tokenType = authToken[1];
+  //Logger.log(oauthToken);
+
+  var input = {
+    'trackingInfo': [
+      {
+        'trackingNumberInfo': {
+          'trackingNumber': trackingInfoReturn,
+        }
+      }
+    ],
+    'includeDetailedScans': 'true'
+  };
+
+  var jsonInput = JSON.stringify(input);
+
+  var requestOptions = {
+    method: 'POST',
+    host: 'https://apis.fedex.com',
+    headers: {
+      "Authorization": tokenType + " " + oauthToken,
+      'Content-Type': 'application/json',
+      "X-locale": "en_US",
+    },
+    payload: jsonInput,
+    //redirect: 'follow',
+    muteHttpExceptions: true
+  };
+  //Logger.log(oauthToken);
+  var response = UrlFetchApp.fetch('https://apis.fedex.com/track/v1/trackingnumbers', requestOptions);
+  var json = JSON.parse(response.getContentText());
+  //Logger.log(response.getContentText());
+  var deliveryDescription = json['output']['completeTrackResults'][0]['trackResults'][0]['latestStatusDetail']['description'];
+  var deliveryDate = json['output']['completeTrackResults'][0]['trackResults'][0]['dateAndTimes'][0]['dateTime'];
+  
+  var deliveryResults = [deliveryDescription, deliveryDate];
+
+  //var test = json['output']['completeTrackResults'][0]['trackResults'];
+  //Logger.log(test);
+  Logger.log(response.getContentText());
+  Logger.log(deliveryDescription);
+  //Logger.log(deliveryDate);
+  //Logger.log(deliveryResults);
+
+  return deliveryResults;
+}
