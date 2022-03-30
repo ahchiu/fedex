@@ -1,0 +1,19 @@
+//sends email based on template from the sheet. template is chosen from checkEmail function
+
+function sendEmail(emailAddress, subject, template, name, shippingAddress, trackingInfo, lastDayOfWork) {
+
+
+  var returnEmail = 'okta-it-returns@okta.com';
+  var messageBody = template.replace("{name}",name).replace("{shippingAddress}",shippingAddress).replace("{trackingInfo}",trackingInfo).replace("{lastDayOfWork}",lastDayOfWork);
+
+    MailApp.sendEmail({
+      to: emailAddress, 
+      subject: subject, 
+      body: messageBody,
+      cc: returnEmail,
+      replyTo: returnEmail
+      });
+
+    Logger.log(messageBody);
+
+}
