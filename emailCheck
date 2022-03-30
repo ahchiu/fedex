@@ -1,0 +1,99 @@
+function checkEmail() {
+  
+  var date = new Date();
+  var sheet = SpreadsheetApp.getActiveSheet();
+  var sheetTemplates = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Templates");
+
+  var startRow = 2;
+  var lastRow = sheet.getLastRow();
+  var lastColumn = sheet.getLastColumn();
+  var lastCell = sheet.getRange(lastRow, lastColumn);
+
+  // Fetch the range of cells A2,1 to lastRow,1
+  var dataRange = sheet.getRange(startRow, 1, (lastRow - 1), 15);
+  var data = dataRange.getValues();
+
+  for (var i = 0; i < data.length; ++i) {
+    var row = data[i];
+    var name = row[0]; // First column
+    var lastDayOfWork = row[1];
+    var emailAddress = row[2];
+    var shippingAddress = row[3];
+    var equipmentStatus = row[4];
+    var trackingInfoTo = row[5];
+    var trackingInfoReturn = row[6];
+    var equipmentStatusRange = sheet.getRange(startRow + i,5);
+    var trackingInfoReturnRange = sheet.getRange(startRow + i,7);
+    var firstEmailDate = sheet.getRange(startRow + i,11);
+    var secondEmailDate = sheet.getRange(startRow + i,12);
+    var thirdEmailDate = sheet.getRange(startRow + i,13);
+    var fourthEmailDate = sheet.getRange(startRow + i,14);
+    var statusCell = row[14];
+    var statusCellRange = sheet.getRange(startRow + i,15);
+
+    var templateInitial = sheetTemplates.getRange(1,1).getValue();
+    var templateFollowUp = sheetTemplates.getRange(2,1).getValue();
+    var templateHR = sheetTemplates.getRange(3,1).getValue();
+
+    var defaultStatus = 'Shipment information sent to FedEx';
+
+    if ((equipmentStatus == defaultStatus) && (statusCell == 0)){
+      
+      var subject = 'Okta Laptop Return - '+ name;
+      var template = templateInitial;
+
+      Logger.log(name +' '+subject);
+      sendEmail(emailAddress, subject, template, name, shippingAddress, trackingInfoTo);
+      sheet.getRange(startRow + i,15).setValue(1);
+      firstEmailDate.setValue(date);
+
+      continue;
+    }
+    else if ((equipmentStatus == defaultStatus) && (statusCell == 1)){
+
+      var subject = '[Second Attempt] Okta Laptop Return - '+ name;
+      var template = templateFollowUp;
+
+      Logger.log(name +' '+subject);
+      sendEmail(emailAddress, subject, template, name, shippingAddress, trackingInfoTo);
+      sheet.getRange(startRow + i, 15).setValue(2);
+      secondEmailDate.setValue(date);
+
+    continue;
+    }
+
+    else if ((equipmentStatus == defaultStatus) && (statusCell == 2)){
+    
+      var subject = '[Third Attempt] Okta Laptop Return - '+ name;
+      var template = templateFollowUp;
+
+      Logger.log(name +' '+subject);
+      sendEmail(emailAddress, subject, template, name, shippingAddress, trackingInfoTo);
+      sheet.getRange(startRow + i, 15).setValue(3);
+      thirdEmailDate.setValue(date);
+
+      continue;
+    }
+    
+    else if ((equipmentStatus == defaultStatus) && (statusCell == 3)){
+      
+      var emailAddress = 'emailAddress';
+      var subject = '[Assistance Requested] Okta Laptop Return - ' + name;
+      var template = templateHR;
+
+      Logger.log("Subject: " + subject);
+      sendEmail(emailAddress, subject, template, name, shippingAddress, trackingInfoTo, lastDayOfWork);
+    sheet.getRange(startRow + i,15).setValue(4);
+    fourthEmailDate.setValue(date);
+    }
+
+    else continue;
+
+  }
+
+}
+
+
+
+
+
