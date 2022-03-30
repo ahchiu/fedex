@@ -1,6 +1,5 @@
 function createShipmentProd(name, mailingAddress, ticketNumber) {
 
-//Logger = BetterLog.useSpreadsheet('1qYzJ3xVJoklzQW_bsa0DSv-f7D_ijDpdmP18cONfFN0'); 
 
   var results = fedexOauthProd();
   var oauthToken = results[0];
@@ -14,7 +13,7 @@ function createShipmentProd(name, mailingAddress, ticketNumber) {
   var senderState = 'CA';
   var senderPost = 'senderPost';
   var countryCode = 'US';
-  var senderPhone = '8004251267'
+  var senderPhone = 'senderPhone'
 
 
   var validatedRecipient = validateAddressProd(mailingAddress);
@@ -107,7 +106,7 @@ function createShipmentProd(name, mailingAddress, ticketNumber) {
     },
     'labelResponseOptions': 'URL_ONLY',
     'accountNumber': {
-      'value': '642425692'
+      'value': 'value'
     }
   };
 
