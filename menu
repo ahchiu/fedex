@@ -1,0 +1,10 @@
+function onOpen() {
+  var ui = SpreadsheetApp.getUi();
+  ui.createMenu('Scripts Menu')
+      .addItem('Check Tracking','trackingFedEx')
+      .addItem('Send Email','checkEmail')
+      .addItem('Create Labels','createLabelProd')
+      .addToUi();
+
+
+}
