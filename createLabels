@@ -1,0 +1,62 @@
+function createLabelProd() {
+
+  var sheet = SpreadsheetApp.getActiveSheet();
+
+  var startRow = 2;
+  var lastRow = sheet.getLastRow();
+  var lastColumn = sheet.getLastColumn();
+  var lastCell = sheet.getRange(lastRow, lastColumn);
+
+  // Fetch the range of cells A2,1 to lastRow,1
+  var dataRange = sheet.getRange(startRow, 1, (lastRow - 1), 10);
+  var data = dataRange.getValues();
+
+  for (var i = 0; i < data.length; ++i) {
+    var row = data[i];
+    var name = row[0]; // First column
+    var emailAddress = row[2];
+    var mailingAddress = row[3];
+    var equipmentStatus = row[4];
+    var trackingInfoTo = row[5];
+    var trackingInfoReturn = row[6];
+    var ticketNumber = row[7];
+    var trackingInfoReturnRange = sheet.getRange(startRow + i, 7);
+    var firstEmailDate = row[10];
+    var secondEmailDate = row[11];
+    var thirdEmailDate = row[12];
+    var fourthEmailDate = row[13];
+    var statusCell = row[14];
+
+    var shipmentLabel = createShipmentProd(name, mailingAddress, ticketNumber);
+    var recipientTracking = shipmentLabel[0];
+    var url = shipmentLabel[1];
+
+    sheet.getRange(startRow + i, 6).setValue(recipientTracking);
+    sheet.getRange(startRow + i, 9).setValue(url);
+
+    Logger.log(name + '\n' + 'Tracking: ' + recipientTracking + '\n' + 'URL: ' + url);
+
+
+    var shipmentLabelReturn = createShipmentReturnProd(name, mailingAddress, ticketNumber);
+    var recipientReturnTracking = shipmentLabelReturn[0];
+    var returnURL = shipmentLabelReturn[1];
+
+    sheet.getRange(startRow + i, 7).setValue(recipientReturnTracking);
+    sheet.getRange(startRow + i, 10).setValue(returnURL);
+
+
+    Logger.log(name + '\n'+ 'Return Tracking: ' + recipientReturnTracking + '\n' + 'URL: ' + returnURL);
+
+
+    continue;
+
+
+  }
+
+}
+
+
+
+
+
+
